@@ -1,16 +1,12 @@
-package cn.bugstack.mybatis.transaction;
+package com.kq.mybatis.transaction;
 
-import cn.bugstack.mybatis.session.TransactionIsolationLevel;
+import com.kq.mybatis.mapping.TransactionIsolationLevel;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 
 /**
- * @author 小傅哥，微信：fustack
- * @description 事务工厂
- * @date 2022/04/13
- * @github https://github.com/fuzhengwei
- * @copyright 公众号：bugstack虫洞栈 | 博客：https://bugstack.cn - 沉淀、分享、成长，让自己和他人都能有所收获！
+ * 事务工厂
  */
 public interface TransactionFactory {
 

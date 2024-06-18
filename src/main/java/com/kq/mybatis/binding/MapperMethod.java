@@ -1,18 +1,13 @@
-package cn.bugstack.mybatis.binding;
+package com.kq.mybatis.binding;
 
-import cn.bugstack.mybatis.mapping.MappedStatement;
-import cn.bugstack.mybatis.mapping.SqlCommandType;
-import cn.bugstack.mybatis.session.Configuration;
-import cn.bugstack.mybatis.session.SqlSession;
-
+import com.kq.mybatis.mapping.MappedStatement;
+import com.kq.mybatis.mapping.SqlCommandType;
+import com.kq.mybatis.session.Configuration;
+import com.kq.mybatis.session.SqlSession;
 import java.lang.reflect.Method;
 
 /**
- * @author 小傅哥，微信：fustack
- * @description 映射器方法
- * @date 2022/04/06
- * @github https://github.com/fuzhengwei
- * @copyright 公众号：bugstack虫洞栈 | 博客：https://bugstack.cn - 沉淀、分享、成长，让自己和他人都能有所收获！
+ * 映射器方法
  */
 public class MapperMethod {
 

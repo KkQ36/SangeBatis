@@ -1,30 +1,29 @@
-package cn.bugstack.mybatis.builder.xml;
+package com.kq.mybatis.builder.xml;
 
-import cn.bugstack.mybatis.builder.BaseBuilder;
-import cn.bugstack.mybatis.io.Resources;
-import cn.bugstack.mybatis.mapping.MappedStatement;
-import cn.bugstack.mybatis.mapping.SqlCommandType;
-import cn.bugstack.mybatis.session.Configuration;
+import com.kq.mybatis.builder.BaseBuilder;
+import com.kq.mybatis.datasource.DataSourceFactory;
+import com.kq.mybatis.io.Resources;
+import com.kq.mybatis.mapping.BoundSql;
+import com.kq.mybatis.mapping.Environment;
+import com.kq.mybatis.mapping.MappedStatement;
+import com.kq.mybatis.mapping.SqlCommandType;
+import com.kq.mybatis.session.Configuration;
+import com.kq.mybatis.transaction.TransactionFactory;
+import com.kq.mybatis.type.TypeAliasRegistry;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.xml.sax.InputSource;
 
+import javax.sql.DataSource;
 import java.io.Reader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * @author 小傅哥，微信：fustack
- * @description XML配置构建器，建造者模式，继承BaseBuilder
- * @date 2022/04/06
- * @github https://github.com/fuzhengwei
- * @copyright 公众号：bugstack虫洞栈 | 博客：https://bugstack.cn - 沉淀、分享、成长，让自己和他人都能有所收获！
+ * XML配置构建器，建造者模式，继承BaseBuilder
  */
 public class XMLConfigBuilder extends BaseBuilder {
 
@@ -45,17 +44,51 @@ public class XMLConfigBuilder extends BaseBuilder {
 
     /**
      * 解析配置；类型别名、插件、对象工厂、对象包装工厂、设置、环境、类型转换、映射器
-     *
      * @return Configuration
      */
     public Configuration parse() {
         try {
+            // 环境
+            environmentsElement(root.element("environments"));
             // 解析映射器
             mapperElement(root.element("mappers"));
         } catch (Exception e) {
             throw new RuntimeException("Error parsing SQL Mapper Configuration. Cause: " + e, e);
         }
         return configuration;
+    }
+
+    private void environmentsElement(Element context) throws Exception {
+        String environment = context.attributeValue("default");
+
+        List<Element> environmentList = context.elements("environment");
+        for (Element e : environmentList) {
+            String id = e.attributeValue("id");
+            if (environment.equals(id)) {
+                // 事务管理器
+                TransactionFactory txFactory = (TransactionFactory) typeAliasRegistry.
+                        resolveAlias(e.element("transactionManager").attributeValue("type")).newInstance();
+
+                // 根据 XML 中配置的数据源来构造 dataSource
+                Element dataSourceElement = e.element("dataSource");
+                DataSourceFactory dataSourceFactory = (DataSourceFactory) typeAliasRegistry.
+                        resolveAlias(dataSourceElement.attributeValue("type")).newInstance();
+                List<Element> propertyList = dataSourceElement.elements("property");
+                Properties props = new Properties();
+                for (Element property : propertyList) {
+                    props.setProperty(property.attributeValue("name"), property.attributeValue("value"));
+                }
+                dataSourceFactory.setProperties(props);
+                DataSource dataSource = dataSourceFactory.getDataSource();
+
+                // 构建环境
+                Environment.EnvironmentBuilder environmentBuilder = Environment.builder()
+                        .transactionFactory(txFactory)
+                        .dataSource(dataSource);
+
+                configuration.setEnvironment(environmentBuilder.build());
+            }
+        }
     }
 
     private void mapperElement(Element mappers) throws Exception {
@@ -91,7 +124,15 @@ public class XMLConfigBuilder extends BaseBuilder {
                 String msId = namespace + "." + id;
                 String nodeName = node.getName();
                 SqlCommandType sqlCommandType = SqlCommandType.valueOf(nodeName.toUpperCase(Locale.ENGLISH));
-                MappedStatement mappedStatement = new MappedStatement.Builder(configuration, msId, sqlCommandType, parameterType, resultType, sql, parameter).build();
+
+                BoundSql boundSql = new BoundSql(sql, parameter, parameterType, resultType);
+
+                MappedStatement mappedStatement = MappedStatement.builder()
+                                                        .configuration(configuration)
+                                                        .id(msId)
+                                                        .sqlCommandType(sqlCommandType)
+                                                        .boundSql(boundSql)
+                                                        .build();
                 // 添加解析 SQL
                 configuration.addMappedStatement(mappedStatement);
             }

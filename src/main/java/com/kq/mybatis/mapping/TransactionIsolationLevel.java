@@ -1,4 +1,4 @@
-package cn.bugstack.mybatis.session;
+package com.kq.mybatis.mapping;
 
 import java.sql.Connection;
 

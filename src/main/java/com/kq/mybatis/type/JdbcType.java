@@ -1,15 +1,11 @@
-package cn.bugstack.mybatis.type;
+package com.kq.mybatis.type;
 
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author 小傅哥，微信：fustack
- * @description JDBC类型枚举
- * @date 2022/04/12
- * @github https://github.com/fuzhengwei
- * @copyright 公众号：bugstack虫洞栈 | 博客：https://bugstack.cn - 沉淀、分享、成长，让自己和他人都能有所收获！
+ * JDBC类型枚举
  */
 public enum JdbcType {
 

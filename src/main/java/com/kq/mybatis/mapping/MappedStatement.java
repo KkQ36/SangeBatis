@@ -1,108 +1,39 @@
-package cn.bugstack.mybatis.mapping;
+package com.kq.mybatis.mapping;
 
-import cn.bugstack.mybatis.session.Configuration;
-
-import java.util.Map;
+import com.kq.mybatis.session.Configuration;
+import lombok.Builder;
+import lombok.Data;
 
 /**
- * @author 小傅哥，微信：fustack
- * 映射语句类
- * 2022/04/06
+ * 映射 XML 文件中的具体 SQL 语句
+ *      <insert id="addUser" parameterType="User">
+ *         INSERT INTO `user`
+ *         (`name`,`email`,`age`,`sex`,`schoolName`)
+ *         VALUES
+ *         (#{name},#{email},#{age},#{sex},#{schoolName})
+ *     </insert>
  */
+@Data
+@Builder
 public class MappedStatement {
 
+    /**
+     * 配置类
+     */
     private Configuration configuration;
-    private String id;
-    private SqlCommandType sqlCommandType;
-
-    private String parameterType;
-    private String resultType;
-    private String sql;
-    private Map<Integer, String> parameter;
-
-    MappedStatement() {
-        // constructor disabled
-    }
 
     /**
-     * 建造者
+     * 语句 id
      */
-    public static class Builder {
+    private String id;
 
-        private MappedStatement mappedStatement = new MappedStatement();
+    /**
+     * 语句类型
+     */
+    private SqlCommandType sqlCommandType;
 
-        public Builder(Configuration configuration, String id, SqlCommandType sqlCommandType, String parameterType, String resultType, String sql, Map<Integer, String> parameter) {
-            mappedStatement.configuration = configuration;
-            mappedStatement.id = id;
-            mappedStatement.sqlCommandType = sqlCommandType;
-            mappedStatement.parameterType = parameterType;
-            mappedStatement.resultType = resultType;
-            mappedStatement.sql = sql;
-            mappedStatement.parameter = parameter;
-        }
-
-        public MappedStatement build() {
-            assert mappedStatement.configuration != null;
-            assert mappedStatement.id != null;
-            return mappedStatement;
-        }
-
-    }
-
-    public Configuration getConfiguration() {
-        return configuration;
-    }
-
-    public void setConfiguration(Configuration configuration) {
-        this.configuration = configuration;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public SqlCommandType getSqlCommandType() {
-        return sqlCommandType;
-    }
-
-    public void setSqlCommandType(SqlCommandType sqlCommandType) {
-        this.sqlCommandType = sqlCommandType;
-    }
-
-    public String getParameterType() {
-        return parameterType;
-    }
-
-    public void setParameterType(String parameterType) {
-        this.parameterType = parameterType;
-    }
-
-    public String getResultType() {
-        return resultType;
-    }
-
-    public void setResultType(String resultType) {
-        this.resultType = resultType;
-    }
-
-    public String getSql() {
-        return sql;
-    }
-
-    public void setSql(String sql) {
-        this.sql = sql;
-    }
-
-    public Map<Integer, String> getParameter() {
-        return parameter;
-    }
-
-    public void setParameter(Map<Integer, String> parameter) {
-        this.parameter = parameter;
-    }
-
+    /**
+     * 关联的 SQL
+     */
+    private BoundSql boundSql;
 }

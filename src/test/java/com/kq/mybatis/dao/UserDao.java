@@ -1,4 +1,6 @@
-package dao;
+package com.kq.mybatis.dao;
+
+import com.kq.mybatis.entity.User;
 
 /**
  * @author kq
@@ -9,10 +11,6 @@ public interface UserDao {
     /**
      * 获取姓名
      */
-    String getName(int id);
+    User queryUserInfoById(int id);
 
-    /**
-     * 获取年龄
-     */
-    Integer getAge(int id);
 }
